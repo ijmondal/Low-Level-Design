@@ -25,7 +25,7 @@ class Ride:
         if self.No_of_seats < 2:
             return dist*self.AMT_PER_KM*(0.75 if isPriority else 1)
         else:
-            return dist*self.No_of_seats*self.AMT_PER_KM*(0.75 if isPriority else 1)
+            return dist*self.No_of_seats*self.AMT_PER_KM*(0.5 if isPriority else 1)
 
 
 class Person:
