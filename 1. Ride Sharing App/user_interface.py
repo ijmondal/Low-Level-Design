@@ -1,11 +1,60 @@
 from enum import Enum
 
+'''
+single-user, single_ride
+A interface is to be built between user and functionalities of the rider class.
+'''
+
 
 class RideStatus(Enum):
     IDLE = 1
     CREATED = 2
     WITHDRAWN = 3
     COMPLETED = 4
+
+
+class System:
+    def __init__(self, drivers=None, riders=list()) -> None:
+        if drivers < 2 or len(riders) < 2:
+            print("Not enough drivers or riders")
+
+        self.__drivers = drivers
+        self.__riders = riders
+
+    def createRide(self, riderId, rideId, origin, dest, seats):
+        if self.__drivers == 0:
+            print("Not enough drivers; can't create ride")
+            return
+
+        for rider in self.__riders:
+            if rider.getId() == riderId:
+                rider.createRide(rideId, origin, dest, seats)
+                self.__drivers -= 1
+                return
+
+    def updateRide(self, riderId, rideId, origin, dest, seats):
+
+        for rider in self.__riders:
+            if rider.getId() == riderId:
+                rider.updateRide(rideId, origin, dest, seats)
+                return
+
+    def withdrawRide(self, riderId, rideId):
+
+        for rider in self.__riders:
+            if rider.getId() == riderId:
+                rider.withdrawRide(rideId)
+                self.__drivers -= 1
+                return
+
+    def closeRide(self, riderId):
+        for rider in self.__riders:
+            if rider.getId() == riderId:
+                self.__drivers -= 1
+                return rider.closeRide()
+
+        print("ride could not be closed.")
+        return 0
 
 
 class Ride:
@@ -43,10 +92,14 @@ class Driver(Person):
 
 
 class Rider(Person):
-    def __init__(self, name):
+    def __init__(self, id, name):
         super().__init__(name)
         self.__currentRide = Ride()
         self.__completedRides = []
+        self.__id = id
+
+    def getId(self):
+        return self.__id
 
     def createRide(self, id, origin, dest, seats):
         if origin >= dest:
@@ -70,7 +123,7 @@ class Rider(Person):
         if self.__currentRide.id != id:
             print("wrong ID as input. Cannot withdraw ride")
             return
-        if self.__currentRide.rideStatus != RideStatus.IDLE:
+        if self.__currentRide.rideStatus == RideStatus.IDLE:
             print("ride doesn't exist. Cannot withdraw ride")
             return
         elif self.__currentRide.rideStatus == RideStatus.COMPLETED:
@@ -88,9 +141,21 @@ class Rider(Person):
 
 
 # property decorators can be used to implement getters and setters
-a = Rider("Ram")
+a = Rider(1, "Ram")
 b = Driver("Shyam")
-a.createRide(1, 10, 20, 1)
-a.updateRide(1, 10, 20, 3)
-print(a.closeRide())
+c = Rider(2, "Laxman")
+d = Rider(3, "Sita")
+L = [a, c, d]
+s = System(3, L)
+s.createRide(1, 1, 10, 20, 1)
+s.createRide(2, 2, 10, 20, 3)
+s.createRide(3, 1, 10, 20, 4)
+print(s.closeRide(1))
+s.withdrawRide(1, 1)
+print(s.closeRide(2))
+
+
+# a.createRide(1, 10, 20, 1)
+# a.updateRide(1, 10, 20, 3)
+# print(a.closeRide())
 # print(r.calculateFare(False))
